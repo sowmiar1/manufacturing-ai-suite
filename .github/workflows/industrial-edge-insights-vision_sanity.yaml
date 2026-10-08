@@ -71,16 +71,34 @@ jobs:
        robot test.robot || true 
        mkdir -p /tmp/test_results
        cp -r report.html log.html output.xml /tmp/test_results/
-       passed=$(xmllint --xpath "//return/status[@status='PASS']" ./output.xml | wc -l) || true
-       failed=$(xmllint --xpath "//return/status[@status='FAIL']" ./output.xml | wc -l) || true
-       not_run=$(xmllint --xpath "//return/status[@status='NOT RUN']" ./output.xml | wc -l) || true
-       total=$((passed + failed + not_run))
-       echo "### Sanity Test Summary" >> $GITHUB_STEP_SUMMARY
-       echo "- Total: $total" >> $GITHUB_STEP_SUMMARY
-       echo "- ✅ Passed: $passed" >> $GITHUB_STEP_SUMMARY
-       echo "- ❌ Failed: $failed" >> $GITHUB_STEP_SUMMARY
-       echo "- ⏭️ Not Run: $not_run" >> $GITHUB_STEP_SUMMARY
-       echo "- 📄 [Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+       summary_file=/tmp/validation-summary.md
+          {
+            echo "# IRD Apps Weekly Validation Report"
+            echo
+            echo "| Test | Total | Passed | Failed | Not Run |"
+            echo "| --- | ---: | ---: | ---: | ---: |"
+          } > "$summary_file"
+          shopt -s nullglob
+          for output_file in /tmp/test_results/output.xml; do
+            test_name=$(basename "$(dirname "$output_file")")
+            passed=$(xmllint --xpath "count(//test/status[@status='PASS'])" "$output_file" 2>/dev/null || echo 0)
+            failed=$(xmllint --xpath "count(//test/status[@status='FAIL'])" "$output_file" 2>/dev/null || echo 0)
+            not_run=$(xmllint --xpath "count(//test/status[@status='NOT RUN'])" "$output_file" 2>/dev/null || echo 0)
+            total=$((passed + failed + not_run))
+            echo "| $test_name | $total | $passed | $failed | $not_run |" >> "$summary_file"
+          done
+          if [[ $(wc -l < "$summary_file") -eq 4 ]]; then
+            echo "| No test results | 0 | 0 | 0 | 0 |" >> "$summary_file"
+          fi
+          echo "" >> "$summary_file"
+          echo "Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> "$summary_file"
+          cat "$summary_file" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo 'body<<EOF'
+            cat "$summary_file"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
     - name: Upload Scan artifact to Github
       if: always()
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
