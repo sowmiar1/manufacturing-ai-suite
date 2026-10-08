@@ -2,9 +2,6 @@ name: "[industrial-edge-insights-vision] PR workflow"
 run-name: "[industrial-edge-insights-vision] PR  workflow (by @${{ github.actor }} via ${{ github.event_name }})"
 on:
   push:
-    branches:
-      - 'main'
-      - 'release*'
     paths:
       - 'industrial-edge-insights-vision/**'
   pull_request:
