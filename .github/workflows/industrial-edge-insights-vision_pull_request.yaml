@@ -2,9 +2,6 @@ name: "[industrial-edge-insights-vision] PR workflow"
 run-name: "[industrial-edge-insights-vision] PR  workflow (by @${{ github.actor }} via ${{ github.event_name }})"
 on:
   push:
-    branches:
-      - 'main'
-      - 'release*'
     paths:
       - 'industrial-edge-insights-vision/**'
   pull_request:
@@ -312,7 +309,7 @@ jobs:
             industrial-edge-insights-vision/helm/trivy-Spineapp-helm.txt
        
   sanity:
-    uses: ./.github/workflows/spineapp_sanity.yaml
+    uses: ./.github/workflows/industrial-edge-insights-vision_sanity.yaml
     with:
       branch:  ${{ github.head_ref }}
     permissions:
