@@ -21,7 +21,7 @@ class utils:
     def __init__(self):
         """Initialize the utils class with the base path."""
         self.path = repo_path
-        self.base_dir = f"{self.path}/manufacturing-ai-suite/industrial-edge-insights-vision"
+        self.base_dir = f"{self.path}/industrial-edge-insights-vision"
 
     def json_reader(self, tc, JSON_PATH):
         """
