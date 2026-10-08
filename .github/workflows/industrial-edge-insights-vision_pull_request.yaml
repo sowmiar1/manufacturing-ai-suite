@@ -309,7 +309,7 @@ jobs:
             industrial-edge-insights-vision/helm/trivy-Spineapp-helm.txt
        
   sanity:
-    uses: ./.github/workflows/spineapp_sanity.yaml
+    uses: ./.github/workflows/industrial-edge-insights-vision_sanity.yaml
     with:
       branch:  ${{ github.head_ref }}
     permissions:
